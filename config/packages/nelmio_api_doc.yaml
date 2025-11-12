@@ -1,0 +1,9 @@
+nelmio_api_doc:
+    documentation:
+        info:
+            title: RECRUTING API
+            description: Endpoint for the api of app recruting
+            version: 1.0.0
+    areas: # to filter documented areas
+        path_patterns:
+            - ^/api(?!/doc$|/token/refresh$)  # Accepts routes under /api except /api/doc
