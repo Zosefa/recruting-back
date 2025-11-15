@@ -70,9 +70,7 @@ class AuthController extends AbstractController
         assert($user instanceof Utilisateur);
 
         return $this->json([
-            'id' => $user->getId(),
-            'email' => $user->getEmail(),
-            'roles' => $user->getRoles(),
+            'user' => $user
         ]);
     }
 }

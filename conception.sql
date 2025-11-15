@@ -18,7 +18,8 @@ CREATE TABLE utilisateurs (
 -- Profil candidat
 CREATE TABLE profils_candidat (
     utilisateur_id INT PRIMARY KEY REFERENCES utilisateurs(id),
-    nom_complet TEXT,
+    nom VARCHAR(250),
+    prenom VARCHAR(250),
     localisation TEXT,
     resume TEXT,
     annees_experience INT DEFAULT 0,

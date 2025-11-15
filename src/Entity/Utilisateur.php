@@ -15,11 +15,11 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['utilisateur:read'])]
+    #[Groups(['utilisateur:read', 'profil_condidat:read'])]
     private ?int $id = null;
 
     #[ORM\Column(name: 'email', type: Types::STRING, length: 180, unique: true)]
-    #[Groups(['utilisateur:read', 'utilisateur:write'])]
+    #[Groups(['utilisateur:read', 'utilisateur:write', 'profil_condidat:read'])]
     private string $email;
 
     #[ORM\Column(name: "role", type: "text", nullable: false)]
