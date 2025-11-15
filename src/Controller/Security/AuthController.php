@@ -1,15 +1,13 @@
 <?php
-// src/Controller/AuthController.php
 
 namespace App\Controller\Security;
 
-use App\Entity\User;
-use Doctrine\ORM\EntityManagerInterface;
-use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+use App\DTO\Utilisateur\UtilisateurDTO;
+use App\Entity\Utilisateur;
+use App\Service\Applicatif\UtilisateurSA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 use OpenApi\Attributes as OA;
@@ -18,27 +16,40 @@ use OpenApi\Attributes as OA;
 #[OA\Tag(name: 'authentification')]
 class AuthController extends AbstractController
 {
+    public function __construct(
+        private UtilisateurSA $utilisateurSA
+    )
+    {}
+
     #[Route('/register', name: 'api_auth_register', methods: ['POST'])]
     public function register(
         Request $request,
-        UserPasswordHasherInterface $passwordHasher,
-        EntityManagerInterface $entityManager,
         SerializerInterface $serializer
     ): JsonResponse {
         $data = json_decode($request->getContent(), true);
 
-        $user = new User();
-        $user->setEmail($data['email']);
-        $user->setPassword($passwordHasher->hashPassword($user, $data['password']));
-        $user->setRoles($data['roles'] ?? ['ROLE_USER']);
+        $dto = new UtilisateurDTO(
+            $data['email'],
+            explode(',', $data['role']),
+            $data['password'],
+            true
+        );
 
-        $entityManager->persist($user);
-        $entityManager->flush();
+        $utilisateur = $this->utilisateurSA->create($dto);
 
-        return new JsonResponse([
-            'message' => 'User created successfully',
-            'user' => json_decode($serializer->serialize($user, 'json', ['groups' => 'user:read']))
-        ], 201);
+        if(is_object($utilisateur))
+        {
+            return new JsonResponse([
+                'success' => true,
+                'message' => 'Utilisateur créer avec succèss',
+                'user' => json_decode($serializer->serialize($utilisateur, 'json', ['groups' => 'utilisateur:read']))
+            ], 201);
+        }else{
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Erreur lors de la création du compte'
+            ], 500);
+        }
     }
 
     #[Route('/login', name: 'api_auth_login', methods: ['POST'])]
@@ -56,7 +67,7 @@ class AuthController extends AbstractController
     {
         $user = $this->getUser();
 
-        assert($user instanceof User);
+        assert($user instanceof Utilisateur);
 
         return $this->json([
             'id' => $user->getId(),
