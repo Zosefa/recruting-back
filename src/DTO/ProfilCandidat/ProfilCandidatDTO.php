@@ -2,14 +2,19 @@
 
 namespace App\DTO\ProfilCandidat;
 
+use Symfony\Component\Validator\Constraints as Assert;
+
 use App\Entity\Utilisateur;
 
 class ProfilCandidatDTO
 {
+    #[Assert\NotBlank()]
     public Utilisateur $utilisateur;
 
+    #[Assert\NotBlank()]
     public string $nom;
 
+    #[Assert\NotBlank()]
     public string $prenom;
 
     public ?string $localisation = null;

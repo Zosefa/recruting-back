@@ -4,6 +4,7 @@ namespace App\Service\Applicatif;
 
 use App\DTO\ProfilCandidat\ProfilCandidatDTO;
 use App\Entity\ProfilCandidat;
+use App\Entity\Utilisateur;
 use App\Service\Metier\ProfilCandidatSM;
 
 class ProfilCandidatSA
@@ -41,5 +42,10 @@ class ProfilCandidatSA
     public function findByNomOrPrenom(string $critere)
     {
         return $this->profilCandidatSM->findByNomOrPrenom($critere);
+    }
+
+    public function findByUtilisateur(Utilisateur $utilisateur)
+    {
+        return $this->profilCandidatSM->findByUtilisateur($utilisateur);
     }
 }
