@@ -5,6 +5,7 @@ namespace App\Controller\Security;
 use App\DTO\Utilisateur\UtilisateurDTO;
 use App\Entity\Utilisateur;
 use App\Service\Applicatif\UtilisateurSA;
+use App\Service\Traitement\UtilisateurST;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,7 +18,8 @@ use OpenApi\Attributes as OA;
 class AuthController extends AbstractController
 {
     public function __construct(
-        private UtilisateurSA $utilisateurSA
+        private UtilisateurSA $utilisateurSA,
+        private UtilisateurST $utilisateurST
     )
     {}
 
@@ -45,6 +47,14 @@ class AuthController extends AbstractController
                 'user' => json_decode($serializer->serialize($utilisateur, 'json', ['groups' => 'utilisateur:read']))
             ], 201);
         }else{
+            if($utilisateur['success'] === false)
+            {
+                return new JsonResponse([
+                    'success' => false,
+                    'message' => $utilisateur['msg']
+                ]);
+            }
+
             return new JsonResponse([
                 'success' => false,
                 'message' => 'Erreur lors de la création du compte'
@@ -69,10 +79,11 @@ class AuthController extends AbstractController
 
         assert($user instanceof Utilisateur);
 
+        $info = $this->utilisateurST->findInfoUser($user->getId());
+
         return $this->json([
-            'id' => $user->getId(),
-            'email' => $user->getEmail(),
-            'roles' => $user->getRoles(),
+            'user' => $user,
+            'info' => $info
         ]);
     }
 }

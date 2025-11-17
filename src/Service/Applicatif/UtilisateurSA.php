@@ -14,6 +14,11 @@ class UtilisateurSA
 
     public function create(UtilisateurDTO $dto)
     {
+        $checkEmailExisting = $this->findByEmail($dto->email);
+        if(is_object($checkEmailExisting))
+        {
+            return ['success' => false , 'msg' => 'Cette email est dejas enregistré !'];
+        }
         return $this->utilisateurSM->create($dto);
     }
 
@@ -34,6 +39,6 @@ class UtilisateurSA
 
     public function findByEmail(string $email)
     {
-        return $this->findByEmail($email);
+        return $this->utilisateurSM->findByEmail($email);
     }
 }
